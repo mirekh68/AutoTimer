@@ -7,7 +7,8 @@ from dateutil import parser
 class AcitivyList:
     def __init__(self, activities):
         self.activities = activities
-    
+        self.start_time = datetime.datetime.now()
+
     def initialize_me(self):
         activity_list = AcitivyList([])
         with open('activities.json', 'r') as f:
@@ -56,6 +57,23 @@ class AcitivyList:
             activities_.append(activity.serialize())
         
         return activities_
+
+    def process_activity(self, activity_name):
+        end_time = datetime.datetime.now()
+        time_entry = TimeEntry(self.start_time, end_time, 0, 0, 0, 0)
+        time_entry._get_specific_times()
+        exists = False
+        for activity in self.activities:
+            if activity.name == activity_name:
+                exists = True
+                activity.time_entries.append(time_entry)
+        if not exists:
+            activity = Activity(activity_name, [time_entry])
+            self.activities.append(activity)
+        with open('activities.json', 'w') as json_file:
+            json.dump(self.serialize(), json_file,
+                      indent=4, sort_keys=True)
+            self.start_time = datetime.datetime.now()
 
 
 class Activity:
