@@ -1,4 +1,4 @@
-from __future__ import print_function
+#from __future__ import print_function
 import time
 from os import system
 from activity import *
@@ -15,38 +15,38 @@ elif sys.platform in ['linux', 'linux2']:
 
 def url_to_name(url):
     string_list = url.split('/')
-    return string_list[2]
+    return url #string_list[2]
 
 
 active_window_name = ""
 activity_name = ""
 activityList = AcitivyList([])
 first_time = True
+prev_window = None
 
 try:
     activityList.initialize_me()
 except Exception:
     print('No json')
 
-
 try:
     while True:
-        previous_site = ""
-        new_window_name = pfm.get_active_window()
-        if 'Google Chrome' in new_window_name:
-            new_window_name = url_to_name(pfm.get_chrome_url())
+        curr_window = pfm.get_active_window()
+        #if 'Google Chrome' in new_window_name:
+        #   new_window_name = url_to_name(pfm.get_chrome_url())
 
-        if active_window_name != new_window_name:
-            print(new_window_name)
-            activity_name = active_window_name
+        if curr_window != prev_window:
+            print(curr_window)
+            #activity_name = curr_window.text
+            pfm.inspect_window(curr_window)
 
-            if not first_time:
-                activityList.process_activity(activity_name)
+            #if not first_time:
+            activityList.process_activity(curr_window.text)
 
             first_time = False
-            active_window_name = new_window_name
+            prev_window = curr_window
 
-        time.sleep(1)
+        time.sleep(1.5)
     
 except KeyboardInterrupt:
     with open('activities.json', 'w') as json_file:
